@@ -7,7 +7,7 @@
 namespace settings
 {
 // Evolution settings.
-const int FitConvergence = 200000;
+const int FitConvergence = 1000;
 const int DumpFrequency = 1000;
 const int LogFrequency = 50;
 const std::string DumpPrefix = "selected\\";
@@ -30,9 +30,9 @@ const int BrushRedMutationRate = 300;
 const int BrushAlphaMutationRate = 300;
 const int PolygonAddPointRate = 300;
 const int PolygonRemovePointRate = 300;
-const int CanvasAddPolygonRate = 2;
+const int CanvasAddPolygonRate = 20;
 const int CanvasRemovePolygonRate = 100;
-const int CanvasMovePolygonRate = 1;
+const int CanvasMovePolygonRate = 100;
 
 // Mutation settings.
 const int ColorMutationRange = 5;

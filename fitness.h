@@ -4,7 +4,6 @@
 #include <string>
 #include <opencv\cv.hpp>
 #include "DnaCanvas.h"
-#using <system.drawing.dll>
 
 class Pixel
 {
@@ -18,15 +17,18 @@ public:
 class Fitness
 {
 public:
-	Fitness();
-	static double GetFitness(
-		const DnaCanvas& canvas, const unsigned char* target,
-		System::Drawing::Bitmap^ bmp, System::Drawing::Graphics^ graph);
-	static Pixel GetPixel(System::Drawing::Imaging::BitmapData^ bmd,
-		int x, int y);
+	Fitness(const std::string& target_name);
+	double GetFitness(const DnaCanvas& canvas);
+	int original_height;
+	int original_width;
 private:
+	void ResizeTarget();
+	void ResetTargetDataPtr();
+	void ResetPlotDataPtr();
 	cv::Mat plot;
-	cv::Mat polygonPlot;
+	cv::Mat target;
+	const unsigned char* target_data;
+	const unsigned char* plot_data;
 };
 
 #endif

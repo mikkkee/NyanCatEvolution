@@ -1,4 +1,5 @@
 #include "fitness.h"
+#include <cassert>
 #include <iostream>
 #include "renderer.h"
 #include "settings.h"
@@ -9,10 +10,13 @@ Pixel::Pixel(int red, int green, int blue): R(red), G(green), B(blue) {}
 // to avoid creating/destroying Mat repeatly.
 // plot and polygonPlot act as buffer holder when rendering canvas and 
 // polygons in canvas.
-Fitness::Fitness():
+Fitness::Fitness(const std::string& target_name) :
 plot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType)),
-polygonPlot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType))
+target(cv::imread(target_name))
 {
+	original_height = target.rows;
+	original_width = target.cols;
+	ResizeTarget();
 }
 
 // Calculates fitness score between canvas and target.
@@ -20,19 +24,11 @@ polygonPlot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMat
 // Uses a pointer to BitmapData to speedup scan in rendered Bitmap image.
 // bm is used to plot canvas on it.
 // graph manages operations on bm.
-double Fitness::GetFitness(
-	const DnaCanvas& canvas, const unsigned char* target,
-	System::Drawing::Bitmap^ bm, System::Drawing::Graphics^ graph)
+double Fitness::GetFitness(const DnaCanvas& canvas)
 {
-	renderer::Render(canvas, graph);
-
-	// Locks bm in memory to access its data.
-	System::Drawing::Imaging::BitmapData^ bmd = bm->LockBits(
-		System::Drawing::Rectangle(0, 0, settings::MaxWidth, settings::MaxHeight),
-		System::Drawing::Imaging::ImageLockMode::ReadOnly,
-		System::Drawing::Imaging::PixelFormat::Format32bppArgb
-		);
-
+	renderer::Render(canvas, plot);
+	ResetTargetDataPtr();
+	ResetPlotDataPtr();
 	double score = 0;
 	// Applies penalty for too much polygons.
 	// Less polygons means less calculation.
@@ -41,29 +37,45 @@ double Fitness::GetFitness(
 		for (int x = 0; x < settings::MaxWidth; ++x) {
 			// Target is a unsigned char * pointed to the array
 			// of three channel pixel values.
-			int targetBlue = static_cast<int>(*target++);
-			int targetGreen = static_cast<int>(*target++);
-			int targetRed = static_cast<int>(*target++);
+			int target_blue = static_cast<int>(*target_data++);
+			int target_green = static_cast<int>(*target_data++);
+			int target_red = static_cast<int>(*target_data++);
+			int plot_blue = static_cast<int>(*plot_data++);
+			int plot_green = static_cast<int>(*plot_data++);
+			int plot_red = static_cast<int>(*plot_data++);
 
-			Pixel p = GetPixel(bmd, x, y);
-			int r = p.R - targetRed;
-			int g = p.G - targetGreen;
-			int b = p.B - targetBlue;
+			int r = plot_red - target_red;
+			int g = plot_green - target_green;
+			int b = plot_blue - target_blue;
 
 			score += abs(r) + abs(b) + abs(g);
 		};
 	};
-	bm->UnlockBits(bmd);
 	return score;
 }
 
-// Returns pixel value of a BitmapData at position (x, y) by using pointer
-// to the beginning of the data:
-// p = ptr + row_length * y + pixel_bit_size * x;
-Pixel Fitness::GetPixel(System::Drawing::Imaging::BitmapData^ bmd,
-	int x, int y)
+void Fitness::ResizeTarget()
 {
-	System::Byte* p = (System::Byte *)bmd->Scan0.ToPointer() + y * bmd->Stride + 4 * x;
-	Pixel px(p[2], p[1], p[0]);
-	return px;
+	assert(target.data);
+	target.convertTo(target, settings::CanvasMatDataType);
+	// Resize target image to:
+	// 1. Reduce calculations if image is too large.
+	// 2. Fixed canvas range makes it easier when generating random points.
+	cv::resize(target, target, cv::Size(settings::MaxHeight, settings::MaxWidth));
+}
+
+void Fitness::ResetTargetDataPtr()
+{
+	// Get a pointer to pixel arrays to target Mat's transposition.
+	// The Mat should be continuous to allow one pointer to scan whole data.
+	assert(target.isContinuous());
+	target_data = target.data;
+}
+
+void Fitness::ResetPlotDataPtr()
+{
+	// Get a pointer to pixel arrays to target Mat's transposition.
+	// The Mat should be continuous to allow one pointer to scan whole data.
+	assert(plot.isContinuous());
+	plot_data = plot.data;
 }

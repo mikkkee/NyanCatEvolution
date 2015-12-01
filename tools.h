@@ -3,8 +3,6 @@
 
 #include <string>
 #include <opencv\cv.hpp>
-#using <system.dll>
-#using <system.drawing.dll>
 
 class DnaPoint;
 class DnaPolygon;
@@ -25,8 +23,7 @@ const unsigned char* const PrepareTarget(cv::Mat& target);
 // scale_y * settings::MaxHeight. Otherwise, the saved image may be incomplete.
 // graph should be created from bm.
 void DumpCanvas(const DnaCanvas& canvas, const int selected,
-	System::Drawing::Bitmap^ bm, System::Drawing::Graphics^ graph,
-	const double scale_x, const double scale_y);
+	cv::Mat& plot, const double scale_x, const double scale_y);
 
 // Sets random seed.
 void RandInit();
@@ -53,16 +50,6 @@ void PrintCanvas(const DnaCanvas& canvas);
 // Prints evolution details into console in human readable format.
 void PrintEvolution(const int generation, const int selected,
 	const double score, const DnaCanvas& canvas);
-
-// A managed class used to call Windows Random API.
-ref class ToolsWin
-{
-public:
-	static System::Random^ random_ = gcnew System::Random();
-	static int GetRandomNumber(int min, int max);
-	static bool WillMutate(int mutationRante);
-};
-
 }
 
 #endif
