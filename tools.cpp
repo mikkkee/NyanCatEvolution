@@ -2,6 +2,7 @@
 #include <ctime>
 #include <cassert>
 #include <iostream>
+#include <iomanip>
 #include <opencv\highgui.h>
 #include "DnaCanvas.h"
 #include "DnaPoint.h"
@@ -9,7 +10,6 @@
 #include "fitness.h"
 #include "renderer.h"
 #include "settings.h"
-
 
 namespace tools {
 
@@ -138,10 +138,11 @@ void PrintEvolution(const int generation, const int selected,
 	const double score,
 	const DnaCanvas& canvas)
 {
+	std::cout << std::fixed;
 	std::cout << "\rP: " << generation << " | "
 		<< "S: " << selected << " | "
-		<< "Nplgns: " << canvas.polygons->size() << " | "
-		<< "Npts: " << canvas.PointCount() << " | "
-		<< "Score: " << score;
+		<< "Nplgns: " << std::setw(3) << canvas.polygons->size() << " | "
+		<< "Npts: " << std::setw(1) << canvas.PointCount() << " | "
+		<< "Score: " << std::setw(8) << score;
 }
 }
