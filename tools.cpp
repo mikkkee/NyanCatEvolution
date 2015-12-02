@@ -142,6 +142,6 @@ void PrintEvolution(const int generation, const int selected,
 		<< "S: " << selected << " | "
 		<< "Nplgns: " << std::setw(3) << canvas.polygons->size() << " | "
 		<< "Npts: " << std::setw(1) << canvas.PointCount() << " | "
-		<< "Score: " << std::setw(8) << score;
+		<< "Score: " << std::setw(8) << score << std::flush;
 }
 }
