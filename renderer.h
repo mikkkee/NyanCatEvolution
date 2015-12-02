@@ -3,31 +3,32 @@
 
 #include <string>
 #include <vector>
-#include <opencv\cv.hpp>
+#include <opencv/cv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include "DnaBrush.h"
 #include "DnaCanvas.h"
 #include "DnaPolygon.h"
 
-// Functions that render/save canvas to image.
+// Contains functions that render/save canvas to image.
 namespace renderer{
 
-// Plots canvas onto graph.
-// If scale_x and scale_y are present, it scales canvas onto graph.
+// Plots canvas onto an image.
+// If scale_x and scale_y are present, this function scales points coordinations
+// by factor scale_x and scale_y before ploting canvas onto graph.
 void Render(const DnaCanvas& canvas, cv::Mat& plot);
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
 	double scale_x, double scale_y);
-
+// Plots a DnaPolygon object on to an image.
+// scale_x and scale_y are used to scale the polygon before ploting.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 	double scale_x, double scale_y);
 
 // Returns a Scalar object which defines the same color of polygon's brush.
 cv::Scalar GetPolygonBrush(const DnaPolygon& polygon);
-
+// Returns a vector that contains all points of a DnaPolygon in cv::Point format.
 std::vector<cv::Point>* GetPolygonPointsVector(const DnaPolygon& polygon,
 	double scale_x, double scale_y);
-
-// Saves a canvas to image by using bm and graph. scale_x and scale_y are 
-// scale factors.;
+// Saves a canvas to image of given name. scale_x and scale_y are scale factors.
 // Example:
 //     SaveCanvasToImageAs(canvas, "happy.png", bm, graph, 2.0, 2.0);
 void SaveCanvasToImageAs(const DnaCanvas& canvas, const std::string& filename,

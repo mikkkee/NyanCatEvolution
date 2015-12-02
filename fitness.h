@@ -2,7 +2,8 @@
 #define EVOART_FITNESS_H_
 
 #include <string>
-#include <opencv\cv.hpp>
+#include <opencv/cv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include "DnaCanvas.h"
 
 class Pixel

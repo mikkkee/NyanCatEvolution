@@ -2,7 +2,8 @@
 #define EVOART_TOOLS_H_
 
 #include <string>
-#include <opencv\cv.hpp>
+#include <opencv/cv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 class DnaPoint;
 class DnaPolygon;

@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
-#include <opencv\highgui.h>
+#include <opencv2/highgui/highgui.hpp>
 #include "DnaCanvas.h"
 #include "DnaPoint.h"
 #include "DnaPolygon.h"
@@ -64,7 +64,7 @@ void StartEvolution(const std::string& target_name)
 // 2. Converts its DataType to what Settings specifies.
 // 3. Resizes it to speed up fitness calculation.
 // 4. Returns a pointer to the beginning of its data for fast scan accross all pixels.
-// 
+//
 // The return pointer points to the beginning of target Mat's data array.
 //
 // This function can fail if !target.isContinuous().

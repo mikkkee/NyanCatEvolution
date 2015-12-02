@@ -6,7 +6,7 @@ namespace renderer{
 
 void Render(const DnaCanvas& canvas, cv::Mat& plot)
 {
-	plot.setTo(cv::Scalar(0, 0, 0));
+	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, 1.0, 1.0);
 	};
@@ -15,7 +15,7 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot)
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
 	double scale_x, double scale_y)
 {
-	plot.setTo(cv::Scalar(0, 0, 0));
+	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, scale_x, scale_y);
 	};
@@ -28,8 +28,8 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
 	cv::Point* points = &((*points_vec)[0]);
 	int n = static_cast<int>(polygon.points->size());
-	cv::fillConvexPoly(plot, points, n, brush, cv::CV_AA);
-	delete points_vec;  // Release vector allocated by new.
+	cv::fillConvexPoly(plot, points, n, brush, 16);
+	delete points_vec;  // Releases vector allocated by new.
 }
 
 cv::Scalar GetPolygonBrush(
