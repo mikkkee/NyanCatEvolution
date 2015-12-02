@@ -3,7 +3,6 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
-#include <opencv2/highgui/highgui.hpp>
 #include "DnaCanvas.h"
 #include "DnaPoint.h"
 #include "DnaPolygon.h"

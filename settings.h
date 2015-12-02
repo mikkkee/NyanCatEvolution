@@ -9,7 +9,7 @@ namespace settings
 // Evolution settings.
 const int DumpFrequency = 1000;  // Sets frequency of snapshot saving.
 const int LogFrequency = 50;     // Sets frequency of console output.
-const std::string DumpPrefix = "selected\\";
+const std::string DumpPrefix = "selected/";
 const std::string DumpExtension = ".png";
 const int FitConvergence = 1000;
 
