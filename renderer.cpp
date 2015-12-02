@@ -28,7 +28,7 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
 	cv::Point* points = &((*points_vec)[0]);
 	int n = static_cast<int>(polygon.points->size());
-	cv::fillConvexPoly(plot, points, n, brush, cv::LINE_AA);
+	cv::fillConvexPoly(plot, points, n, brush, cv::CV_AA);
 	delete points_vec;  // Release vector allocated by new.
 }
 
