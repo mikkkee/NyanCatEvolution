@@ -12,6 +12,26 @@
 
 namespace tools {
 
+SaveTool::SaveTool() :
+plot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType)),
+subplot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType))
+{}
+
+void SaveTool::SaveCanvasAsImage(const std::string& filename, const DnaCanvas& canvas,
+	const double scale_x, const double scale_y, bool opaque)
+{
+	cv::Size size(settings::MaxWidth * scale_x, settings::MaxHeight * scale_y);
+	cv::resize(plot, plot, size);
+	cv::resize(subplot, subplot, size);
+	if (opaque) {
+		renderer::Render(canvas, plot, scale_x, scale_y);
+	}
+	else {
+		renderer::Render(canvas, plot, subplot, scale_x, scale_y);
+	};
+	cv::imwrite(filename, plot);
+}
+
 void StartEvolution(const std::string& target_name)
 {
 	using namespace std;
@@ -19,17 +39,17 @@ void StartEvolution(const std::string& target_name)
 
 	RandInit();  // Sets random seed.
 	Fitness fitness(target_name);
-	double scale_x = static_cast<double>(fitness.original_width) / settings::MaxWidth;
-	double scale_y = static_cast<double>(fitness.original_height) / settings::MaxHeight;
-	// Mat object for saving canvas as image.
-	cv::Mat save_plot(fitness.original_height, fitness.original_width,
-		settings::CanvasMatDataType);
+	const double scale_x = static_cast<double>(fitness.original_width) / settings::MaxWidth;
+	const double scale_y = static_cast<double>(fitness.original_height) / settings::MaxHeight;
+	bool opaque = (settings::BrushAlphaMutationHigh == settings::BrushAlphaMutationLow) && 
+		(settings::BrushAlphaMutationHigh == 255);  // Use opaque polygons if alpha is fixed to 255.
+	tools::SaveTool save_tool;
 
 	DnaCanvas parent;
 	int population = 0;    // Count of mutated DNAs.
 	int selected = 0;      // Count of "good" mutated DNAs.
 	bool written = false;  // Whether parent has been written to disk.
-	double current_score = fitness.GetFitness(parent);
+	double current_score = fitness.GetFitness(parent, opaque);
 	double next_score = 0.0;
 
 	// Keeps evoluting until reaches convergence condition.
@@ -38,7 +58,7 @@ void StartEvolution(const std::string& target_name)
 		offspring.Mutate();
 		if (offspring.is_dirty) {
 			population++;
-			next_score = fitness.GetFitness(offspring);
+			next_score = fitness.GetFitness(offspring, opaque);
 
 			if (next_score <= current_score) {
 				selected++;
@@ -52,7 +72,9 @@ void StartEvolution(const std::string& target_name)
 		};
 		// Dumps "gooded" mutated images.
 		if ((selected % settings::DumpFrequency == 0) && !written) {
-			DumpCanvas(parent, selected, save_plot, scale_x, scale_y);
+			ostringstream name;
+			name << settings::DumpPrefix << selected << settings::DumpExtension;
+			save_tool.SaveCanvasAsImage(name.str(), parent, scale_x, scale_y, opaque);
 			written = true;
 		};
 	};

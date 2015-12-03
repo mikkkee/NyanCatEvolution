@@ -10,6 +10,17 @@ class DnaPolygon;
 class DnaCanvas;
 
 namespace tools {
+// Tools to save canvas into image.
+class SaveTool
+{
+public:
+	SaveTool();
+	void SaveCanvasAsImage(const std::string& filename, const DnaCanvas& canvas,
+		const double scale_x, const double scale_y, bool opaque);
+private:
+	cv::Mat plot;     // A plot that holds blended canvas.
+	cv::Mat subplot;  // A plot that holds each polygon before blending to canvas plot.
+};
 
 // Starts a generic evolution towards target_name, a image file.
 void StartEvolution(const std::string& target_name);

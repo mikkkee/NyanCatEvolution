@@ -3,7 +3,7 @@
 #include "settings.h"
 
 namespace renderer{
-
+// Renders image by using opaque polygons.
 void Render(const DnaCanvas& canvas, cv::Mat& plot)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
@@ -11,9 +11,9 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot)
 		RenderPolygon(polygon, plot, 1.0, 1.0);
 	};
 }
-
+// Renders image by using opaque polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
-	double scale_x, double scale_y)
+	const double scale_x, const double scale_y)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
@@ -21,8 +21,26 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot,
 	};
 }
 
+void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot)
+{
+	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
+	for (auto & polygon : *canvas.polygons) {
+		RenderPolygon(polygon, plot, subplot, 1.0, 1.0);
+	};
+}
+
+void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot,
+	const double scale_x, const double scale_y)
+{
+	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
+	for (auto & polygon : *canvas.polygons) {
+		RenderPolygon(polygon, plot, subplot, scale_x, scale_y);
+	};
+}
+
+// Renders opaque polygon.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
-	double scale_x, double scale_y)
+	const double scale_x, const double scale_y)
 {
 	cv::Scalar brush = GetPolygonBrush(polygon);
 	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
@@ -30,6 +48,19 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 	int n = static_cast<int>(polygon.points->size());
 	cv::fillConvexPoly(plot, points, n, brush, 16);
 	delete points_vec;  // Releases vector allocated by new.
+}
+
+void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
+	const double scale_x, const double scale_y)
+{
+	subplot.setTo(cv::Scalar(0, 0, 0));
+	cv::Scalar brush = GetPolygonBrush(polygon);
+	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
+	cv::Point* points = &((*points_vec)[0]);
+	int n = static_cast<int>(polygon.points->size());
+	cv::fillConvexPoly(subplot, points, n, brush, 16);  // Plot polygon.
+	cv::add(plot, subplot, plot);                       // Blend polygon with canvas.
+	delete points_vec;                                  // Releases vector allocated by new.
 }
 
 cv::Scalar GetPolygonBrush(
@@ -57,7 +88,7 @@ std::vector<cv::Point>* GetPolygonPointsVector(
 
 void SaveCanvasToImageAs(
 	const DnaCanvas& canvas, const std::string& filename, cv::Mat& plot,
-	const double scale_x, double scale_y)
+	const const double scale_x, const double scale_y)
 {
 	// Convert std::string to System::String.
 	Render(canvas, plot, scale_x, scale_y);

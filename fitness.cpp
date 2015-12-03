@@ -12,6 +12,7 @@ Pixel::Pixel(int red, int green, int blue): R(red), G(green), B(blue) {}
 // polygons in canvas.
 Fitness::Fitness(const std::string& target_name) :
 plot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType)),
+subplot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType)),
 target(cv::imread(target_name))
 {
 	original_height = target.rows;
@@ -24,9 +25,13 @@ target(cv::imread(target_name))
 // Uses a pointer to BitmapData to speedup scan in rendered Bitmap image.
 // bm is used to plot canvas on it.
 // graph manages operations on bm.
-double Fitness::GetFitness(const DnaCanvas& canvas)
+double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 {
-	renderer::Render(canvas, plot);
+	if (opaque) {
+		renderer::Render(canvas, plot, subplot);
+	} else {
+		renderer::Render(canvas, plot);
+	};
 	ResetTargetDataPtr();
 	ResetPlotDataPtr();
 	double score = 0;
