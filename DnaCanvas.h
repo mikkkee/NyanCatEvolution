@@ -24,5 +24,4 @@ private:
 	void RemovePolygon();
 	void MovePolygon();
 };
-
 #endif

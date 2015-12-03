@@ -4,8 +4,6 @@
 #include "renderer.h"
 #include "settings.h"
 
-Pixel::Pixel(int red, int green, int blue): R(red), G(green), B(blue) {}
-
 // Initializes Fitness object with its plot & polygonPlot data member 
 // to avoid creating/destroying Mat repeatly.
 // plot and polygonPlot act as buffer holder when rendering canvas and 
@@ -52,7 +50,6 @@ double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 			int r = plot_red - target_red;
 			int g = plot_green - target_green;
 			int b = plot_blue - target_blue;
-
 			score += abs(r) + abs(b) + abs(g);
 		};
 	};

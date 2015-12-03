@@ -26,5 +26,4 @@ private:
 	void AddPoint(DnaCanvas& canvas);
 	void RemovePoint(DnaCanvas& canvas);
 };
-
 #endif

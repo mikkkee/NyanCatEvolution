@@ -6,15 +6,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "DnaCanvas.h"
 
-class Pixel
-{
-public:
-	Pixel(int red, int green, int blue);
-	int R;
-	int G;
-	int B;
-};
-
 class Fitness
 {
 public:
@@ -32,5 +23,4 @@ private:
 	const unsigned char* target_data;
 	const unsigned char* plot_data;
 };
-
 #endif

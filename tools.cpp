@@ -32,6 +32,10 @@ void SaveTool::SaveCanvasAsImage(const std::string& filename, const DnaCanvas& c
 	cv::imwrite(filename, plot);
 }
 
+// Starts an evolution run.
+// 1. Sets up fitness object and saving size.
+// 2. Initializes evolution statistic parameters.
+// 3. Starts genetic evolution and log / dump.
 void StartEvolution(const std::string& target_name)
 {
 	using namespace std;

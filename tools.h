@@ -10,7 +10,7 @@ class DnaPolygon;
 class DnaCanvas;
 
 namespace tools {
-// Tools to save canvas into image.
+// Tool to save canvas into image.
 class SaveTool
 {
 public:
@@ -63,5 +63,4 @@ void PrintCanvas(const DnaCanvas& canvas);
 void PrintEvolution(const int generation, const int selected,
 	const double score, const DnaCanvas& canvas);
 }
-
 #endif

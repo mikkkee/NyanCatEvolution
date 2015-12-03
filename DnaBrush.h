@@ -18,5 +18,4 @@ public:
 	int green;
 	int blue;
 };
-
 #endif

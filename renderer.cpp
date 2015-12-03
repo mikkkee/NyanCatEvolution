@@ -94,5 +94,4 @@ void SaveCanvasToImageAs(
 	Render(canvas, plot, scale_x, scale_y);
 	cv::imwrite(filename, plot);
 }
-
 }
