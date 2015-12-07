@@ -88,7 +88,7 @@ std::vector<cv::Point>* GetPolygonPointsVector(
 
 void SaveCanvasToImageAs(
 	const DnaCanvas& canvas, const std::string& filename, cv::Mat& plot,
-	const const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y)
 {
 	// Convert std::string to System::String.
 	Render(canvas, plot, scale_x, scale_y);
