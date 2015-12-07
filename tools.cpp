@@ -45,7 +45,7 @@ void StartEvolution(const std::string& target_name)
 	Fitness fitness(target_name);
 	const double scale_x = static_cast<double>(fitness.original_width) / settings::MaxWidth;
 	const double scale_y = static_cast<double>(fitness.original_height) / settings::MaxHeight;
-	bool opaque = (settings::BrushAlphaMutationHigh == settings::BrushAlphaMutationLow) && 
+	bool opaque = (settings::BrushAlphaMutationHigh == settings::BrushAlphaMutationLow) &&
 		(settings::BrushAlphaMutationHigh == 255);  // Use opaque polygons if alpha is fixed to 255.
 	tools::SaveTool save_tool;
 
@@ -123,6 +123,7 @@ void RandInit() { srand(time(NULL)); };
 int GetRandomNumber(const int min, const int max)
 {
 	assert(max >= min);
+	if (max == min) return min;
 	return (rand() % (max - min)) + min;
 }
 
