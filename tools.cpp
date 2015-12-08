@@ -123,6 +123,7 @@ void RandInit() { srand(time(NULL)); };
 int GetRandomNumber(const int min, const int max)
 {
 	assert(max >= min);
+	if (max - min == 0) return max;
 	return (rand() % (max - min)) + min;
 }
 
