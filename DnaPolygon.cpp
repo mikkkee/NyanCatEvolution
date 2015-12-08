@@ -78,13 +78,16 @@ DnaPolygon * DnaPolygon::Clone()
 
 void DnaPolygon::Mutate(DnaCanvas& canvas)
 {
-	if (tools::WillMutate(settings::PolygonAddPointRate)) AddPoint(canvas);
-	if (tools::WillMutate(settings::PolygonRemovePointRate)) RemovePoint(canvas);
-	// Mutate each point after adding / removing point.
-	for (auto& point : *points) {
-		point.Mutate(canvas);
-	};
-	brush->Mutate(canvas);
+	int prob = tools::GetRandomNumber(0, settings::PolygonMutationRateBase);
+	int cut1 = settings::PolygonAddPointRate;
+	int cut2 = cut1 + settings::PolygonRemovePointRate;
+	int cut3 = cut2 + settings::PolygonMutatePointRate;
+	int cut4 = cut3 + settings::PolygonMutateBrushRate;
+
+	if (prob < cut1) { AddPoint(canvas); }
+	else if (prob < cut2) { RemovePoint(canvas); }
+	else if (prob < cut3) { MutatePoint(canvas); }
+	else if (prob < cut4) { MutateBrush(canvas); };
 }
 
 void DnaPolygon::AddPoint(DnaCanvas& canvas)
@@ -112,4 +115,15 @@ void DnaPolygon::RemovePoint(DnaCanvas& canvas)
 			canvas.SetDirty();
 		};
 	};
+}
+
+void DnaPolygon::MutatePoint(DnaCanvas& canvas)
+{
+	int index = tools::GetRandomNumber(0, points->size());
+	(*points)[index].Mutate(canvas);
+}
+
+void DnaPolygon::MutateBrush(DnaCanvas& canvas)
+{
+	brush->Mutate(canvas);
 }

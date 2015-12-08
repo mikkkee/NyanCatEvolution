@@ -23,5 +23,6 @@ private:
 	void AddPolygon();
 	void RemovePolygon();
 	void MovePolygon();
+	void MutatePolygon();
 };
 #endif

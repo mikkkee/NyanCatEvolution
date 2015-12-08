@@ -29,30 +29,17 @@ DnaBrush * DnaBrush::Clone(){
 // Alpha value is changed regardless of current value.
 void DnaBrush::Mutate(DnaCanvas& canvas)
 {
-	if (tools::WillMutate(settings::BrushBlueMutationRate)) {
-		blue += tools::GetRandomNumber(
-			-settings::ColorMutationRange, settings::ColorMutationRange + 1);
-		blue = std::min(255, std::max(0, blue));
-		canvas.SetDirty();
-	};
-
-	if (tools::WillMutate(settings::BrushGreenMutationRate)) {
-		green += tools::GetRandomNumber(
-			-settings::ColorMutationRange, settings::ColorMutationRange + 1);
-		green = std::min(255, std::max(0, green));
-		canvas.SetDirty();
-	};
-
-	if (tools::WillMutate(settings::BrushRedMutationRate)) {
-		red += tools::GetRandomNumber(
-			-settings::ColorMutationRange, settings::ColorMutationRange + 1);
-		red = std::min(255, std::max(0, red));
-		canvas.SetDirty();
-	};
-
-	if (tools::WillMutate(settings::BrushAlphaMutationRate)) {
-		alpha = tools::GetRandomNumber(
-			settings::BrushAlphaMutationLow, settings::BrushAlphaMutationHigh +1);
-		canvas.SetDirty();
-	};
+	
+	blue += tools::GetRandomNumber(
+		-settings::ColorMutationRange, settings::ColorMutationRange + 1);
+	blue = std::min(255, std::max(0, blue));
+	green += tools::GetRandomNumber(
+		-settings::ColorMutationRange, settings::ColorMutationRange + 1);
+	green = std::min(255, std::max(0, green));
+    red += tools::GetRandomNumber(
+		-settings::ColorMutationRange, settings::ColorMutationRange + 1);
+	red = std::min(255, std::max(0, red));
+	alpha = tools::GetRandomNumber(
+		settings::BrushAlphaMutationLow, settings::BrushAlphaMutationHigh +1);
+	canvas.SetDirty();
 }
