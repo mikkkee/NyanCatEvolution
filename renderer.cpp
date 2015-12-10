@@ -6,7 +6,7 @@ namespace renderer{
 // Renders image by using opaque polygons.
 void Render(const DnaCanvas& canvas, cv::Mat& plot)
 {
-	plot.setTo(cv::Scalar(0, 0, 0, 255));  // Reset the image color.
+	plot.setTo(cv::Scalar(255, 255, 255, 255));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, 1.0, 1.0);
 	};
@@ -15,7 +15,7 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot)
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
 	const double scale_x, const double scale_y)
 {
-	plot.setTo(cv::Scalar(0, 0, 0, 255));  // Reset the image color.
+	plot.setTo(cv::Scalar(255, 255, 255, 255));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, scale_x, scale_y);
 	};
@@ -23,7 +23,7 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot,
 // Renders image by using semi-transparent polygons.
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot)
 {
-	plot.setTo(cv::Scalar(0, 0, 0, 255));  // Reset the image color.
+	plot.setTo(cv::Scalar(255, 255, 255, 255));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, subplot, 1.0, 1.0);
 	};
@@ -32,7 +32,7 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot)
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot,
 	const double scale_x, const double scale_y)
 {
-	plot.setTo(cv::Scalar(0, 0, 0, 255));  // Reset the image color.
+	plot.setTo(cv::Scalar(255, 255, 255, 255));  // Reset the image color.
 	for (auto & polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, subplot, scale_x, scale_y);
 	};
@@ -59,42 +59,7 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
 	cv::Point* points = &((*points_vec)[0]);
 	int n = static_cast<int>(polygon.points->size());
 	cv::fillConvexPoly(subplot, points, n, brush, 16);  // Plot polygon.
-
-	uchar* subplot_data = subplot.data;
-	uchar* plot_data = plot.data;
-	for (int y = 0; y < settings::MaxHeight; ++y) {
-		for (int x = 0; x < settings::MaxWidth; ++x) {
-			int subplot_blue = static_cast<int>(*subplot_data++);
-			int subplot_green = static_cast<int>(*subplot_data++);
-			int subplot_red = static_cast<int>(*subplot_data++);
-			int subplot_alpha = static_cast<int>(*subplot_data++);
-
-			int plot_blue = static_cast<int>(*plot_data++);
-			int plot_green = static_cast<int>(*plot_data++);
-			int plot_red = static_cast<int>(*plot_data++);
-			int plot_alpha = static_cast<int>(*plot_data++);
-
-			double alpha_fore = static_cast<double>(subplot_alpha) / 255.0;
-			double alpha_back = static_cast<double>(plot_alpha) / 255.0;
-			double alpha_multi = alpha_fore * alpha_back;
-			double alpha_tot = alpha_fore + alpha_back - alpha_multi;
-			double coeff_fore = alpha_fore / alpha_tot;
-			double coeff_back = (alpha_back - alpha_multi) / alpha_tot;
-
-			uchar r = static_cast<uchar>(coeff_fore * subplot_red + coeff_back * plot_red);
-			uchar g = static_cast<uchar>(coeff_fore * subplot_green + coeff_back * plot_green);
-			uchar b = static_cast<uchar>(coeff_fore * subplot_blue + coeff_back * plot_blue);
-			uchar a = static_cast<uchar>(coeff_fore * subplot_alpha + coeff_back * plot_alpha);
-
-			*(--plot_data) = a;
-			*(--plot_data) = r;
-			*(--plot_data) = g;
-			*(--plot_data) = b;
-
-			plot_data += 4;
-		};
-	};
-
+	alpha_composite(subplot, plot, plot);
 	// cv::add(plot, subplot, plot);                       // Blend polygon with canvas.
 	delete points_vec;                                  // Releases vector allocated by new.
 }
@@ -129,5 +94,42 @@ void SaveCanvasToImageAs(
 	// Convert std::string to System::String.
 	Render(canvas, plot, scale_x, scale_y);
 	cv::imwrite(filename, plot);
+}
+
+// Blends image top over image bot and save result into image out.
+// The method used for blending is alpha compositing.
+// To save time, the dimensions of input images are not checked,
+// make sure the three input images have exactly the same size while
+// using this function!
+void alpha_composite(cv::Mat& top, cv::Mat& bot, cv::Mat& out)
+{
+	uchar* bot_data = bot.data;
+	uchar* top_data = top.data;
+	uchar* out_data = out.data;
+	int rows = top.rows;
+	int cols = top.cols;
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			int blue_a = static_cast<int>(*top_data++);
+			int green_a = static_cast<int>(*top_data++);
+			int red_a = static_cast<int>(*top_data++);
+			int alpha_a = static_cast<int>(*top_data++);
+
+			int blue_b = static_cast<int>(*bot_data++);
+			int green_b = static_cast<int>(*bot_data++);
+			int red_b = static_cast<int>(*bot_data++);
+			int alpha_b = static_cast<int>(*bot_data++);
+
+			double aa = alpha_a / 255.0;
+			double ab = alpha_b / 255.0;
+			double ca = aa / (aa + ab - aa * ab);
+			double cb = (ab - aa * ab) / (aa + ab - aa * ab);
+
+			*out_data++ = blue_a * ca + blue_b * cb;
+			*out_data++ = green_a * ca + green_b * cb;
+			*out_data++ = red_a * ca + red_b * cb;
+			*out_data++ = alpha_a * ca + alpha_b * cb;
+		};
+	};
 }
 }

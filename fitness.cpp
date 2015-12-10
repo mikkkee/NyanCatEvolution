@@ -51,6 +51,9 @@ double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 			int g = plot_green - target_green;
 			int b = plot_blue - target_blue;
 			score += abs(r) + abs(b) + abs(g);
+
+			target_data++;
+			plot_data++;
 		};
 	};
 	return score;

@@ -41,5 +41,11 @@ std::vector<cv::Point>* GetPolygonPointsVector(const DnaPolygon& polygon,
 //     SaveCanvasToImageAs(canvas, "happy.png", bm, graph, 2.0, 2.0);
 void SaveCanvasToImageAs(const DnaCanvas& canvas, const std::string& filename,
 	cv::Mat& plot, const double scale_x, const double scale_y);
+
+// Blends two images by alpha compositing method.
+// The size of input images are not checked.
+// Make sure the three images have exactly the same size when using
+// this function !!!
+void alpha_composite(cv::Mat& top, cv::Mat& bot, cv::Mat& out);
 }
 #endif
