@@ -14,11 +14,12 @@ if (MSVC)
   # Rename OpenCV_INCLUDE_DIRS to be compatible with non-MSVC environment.
   set(OPENCV_INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
   set(OpenCV_ADDITIONAL_DEPENDENCIES
-    ${OpenCV_DIR}/x86/vc12/lib/opencv_ts300.lib
-    ${OpenCV_DIR}/x86/vc12/lib/opencv_world300.lib
+    ${OpenCV_DIR}/x86/vc12/lib/opencv_ts300d.lib
+    ${OpenCV_DIR}/x86/vc12/lib/opencv_world300d.lib
     )
+  link_directories(${OpenCV_DIR}/x86/vc12/lib)
 
-else()
+else(MSVC)
   # non-MSVC environment.
   include(FindPkgConfig)
   find_package(PkgConfig REQUIRED)
