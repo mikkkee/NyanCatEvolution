@@ -26,9 +26,9 @@ target(cv::imread(target_name))
 double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 {
 	if (opaque) {
-		renderer::Render(canvas, plot, subplot);
-	} else {
 		renderer::Render(canvas, plot);
+	} else {
+		renderer::Render(canvas, plot, subplot);
 	};
 	ResetTargetDataPtr();
 	ResetPlotDataPtr();
