@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "DnaCanvas.h"
 #include "DnaPoint.h"
 #include "DnaPolygon.h"
@@ -70,8 +71,11 @@ void StartEvolution(const std::string& target_name)
 				parent = offspring;
 				current_score = next_score;
 			};
-			if (population % settings::LogFrequency == 0) {
+			if (population % settings::ConsoleLogFrequency == 0) {
 				tools::PrintEvolution(population, selected, current_score, parent);
+			};
+			if (population % settings::FileLogFrequency == 0) {
+				tools::WriteLog(population, selected, current_score);
 			};
 		};
 		// Dumps "gooded" mutated images.
@@ -170,5 +174,17 @@ void PrintEvolution(const int generation, const int selected,
 		<< "Nplgns: " << std::setw(3) << canvas.polygons->size() << " | "
 		<< "Npts: " << std::setw(1) << canvas.PointCount() << " | "
 		<< "Score: " << std::setw(8) << score << std::flush;
+}
+
+// Write log to a file named evolution.log. 
+void WriteLog(const int population, const int selected, const double score)
+{
+	std::ofstream log_file;
+	log_file.open("evolution.log", std::ios::app);
+	std::ostringstream log_line;
+	time_t now = time(0);
+	log_line << now << " " << population << " " << selected << " " << score << "\n";
+	log_file << log_line.str();
+	log_file.close();
 }
 }
