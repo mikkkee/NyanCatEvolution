@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include "DnaCanvas.h"
 #include "DnaPoint.h"
 #include "DnaPolygon.h"
@@ -45,7 +46,7 @@ void StartEvolution(const std::string& target_name)
 	Fitness fitness(target_name);
 	const double scale_x = static_cast<double>(fitness.original_width) / settings::MaxWidth;
 	const double scale_y = static_cast<double>(fitness.original_height) / settings::MaxHeight;
-	bool opaque = (settings::BrushAlphaMutationHigh == settings::BrushAlphaMutationLow) && 
+	bool opaque = (settings::BrushAlphaMutationHigh == settings::BrushAlphaMutationLow) &&
 		(settings::BrushAlphaMutationHigh == 255);  // Use opaque polygons if alpha is fixed to 255.
 	tools::SaveTool save_tool;
 
@@ -70,8 +71,11 @@ void StartEvolution(const std::string& target_name)
 				parent = offspring;
 				current_score = next_score;
 			};
-			if (population % settings::LogFrequency == 0) {
+			if (population % settings::ConsoleLogFrequency == 0) {
 				tools::PrintEvolution(population, selected, current_score, parent);
+			};
+			if (population % settings::FileLogFrequency == 0) {
+				tools::WriteLog(population, selected, current_score);
 			};
 		};
 		// Dumps "gooded" mutated images.
@@ -123,6 +127,7 @@ void RandInit() { srand(time(NULL)); };
 int GetRandomNumber(const int min, const int max)
 {
 	assert(max >= min);
+	if (max == min) return min;
 	return (rand() % (max - min)) + min;
 }
 
@@ -169,5 +174,17 @@ void PrintEvolution(const int generation, const int selected,
 		<< "Nplgns: " << std::setw(3) << canvas.polygons->size() << " | "
 		<< "Npts: " << std::setw(1) << canvas.PointCount() << " | "
 		<< "Score: " << std::setw(8) << score << std::flush;
+}
+
+// Write log to a file named evolution.log. 
+void WriteLog(const int population, const int selected, const double score)
+{
+	std::ofstream log_file;
+	log_file.open("evolution.log", std::ios::app);
+	std::ostringstream log_line;
+	time_t now = time(0);
+	log_line << now << " " << population << " " << selected << " " << score << "\n";
+	log_file << log_line.str();
+	log_file.close();
 }
 }

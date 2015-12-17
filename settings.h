@@ -8,10 +8,12 @@ namespace settings
 {
 // Evolution settings.
 const int DumpFrequency = 1000;  // Sets frequency of snapshot saving.
-const int LogFrequency = 50;     // Sets frequency of console output.
+const int ConsoleLogFrequency = 50;     // Sets frequency of console output.
 const std::string DumpPrefix = "selected/";
 const std::string DumpExtension = ".png";
 const int FitConvergence = 1000;
+const int FileLog = true;
+const int FileLogFrequency = 1000;
 
 // Rendering settings.
 // MaxWidth and MaxHeight sets the image size used for fitness calculation.

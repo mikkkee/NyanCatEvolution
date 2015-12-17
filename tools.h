@@ -62,5 +62,8 @@ void PrintCanvas(const DnaCanvas& canvas);
 // Prints evolution details into console in human readable format.
 void PrintEvolution(const int generation, const int selected,
 	const double score, const DnaCanvas& canvas);
+
+// Used to log number of mutations / good mucations / fitness score vs time.
+void WriteLog(const int population, const int selected, const double score);
 }
 #endif
