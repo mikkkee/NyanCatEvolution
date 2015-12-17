@@ -16,27 +16,47 @@ const int FileLog = true;
 const int FileLogFrequency = 1000;
 
 // Rendering settings.
+// MaxWidth and MaxHeight sets the image size used for fitness calculation.
+// Increasing of MaxWidth and MaxHeight increases the matching quality as well as
+// computation loads.
+// Carefully choose the values to compromise between image quality and speed.
 const auto CanvasMatDataType = CV_8UC3;
-const int MaxWidth = 200;   // Sets the size used for fitness calculation.
-const int MaxHeight = 200;  // Adjust MaxHeight and MaxWidth to comprimise between speed and image quality.
+const int MaxWidth = 200;
+const int MaxHeight = 200;
 
-// Mutation rates, a muration rate N means this mutation
-// happens with a probability of 1 / N.
-const int CanvasAddPolygonRate = 20;
-const int CanvasRemovePolygonRate = 100;
-const int CanvasMovePolygonRate = 100;
-const int PointMaxMutationRate = 2000;  // Move anywhere in canvas.
-const int PointMidMutationRate = 600;   // Move around original position.
-const int PointMinMutationRate = 600;   // Move around original position slightly.
-const int BrushBlueMutationRate = 300;
-const int BrushGreenMutationRate = 300;
-const int BrushRedMutationRate = 300;
-const int BrushAlphaMutationRate = 300;
-const int PolygonAddPointRate = 300;
-const int PolygonRemovePointRate = 300;
+// Mutation Rates.
+// The sum of all mutations rates for a class shall not exceed its MutationRateBase.
+// Mutation rates are calculated by dividing its value by MutationRateBase for that class.
+// Mutation selection strategy:
+// 1. A random integer p is generated between [0, MutationRateBase).
+// 2. Test if p falls in one of the intevals: [0, r1), [r1, r1+r2),  [r1+r2, r1+r2+r3), ....
+// 3. Apply mutation with rate r1, r2, or r3, ..., accordingly.
+// Note: it's not necessary for mutation rates sum to be equal to MutationRateBase.
+const int CanvasAddPolygonRate = 1000;
+const int CanvasRemovePolygonRate = 1000;
+const int CanvasMovePolygonRate = 1000;
+const int CanvasMutatePolygonRate = 7000;
+const int CanvasMutationRateBase = 10000;
+
+const int PolygonAddPointRate = 2500;
+const int PolygonRemovePointRate = 2500;
+const int PolygonMutatePointRate = 2500;
+const int PolygonMutateBrushRate = 2500;
+const int PolygonMutationRateBase = 10000;
+
+const int PointMaxMutationRate = 100;  // Move anywhere in canvas.
+const int PointMidMutationRate = 1000;   // Move around original position.
+const int PointMinMutationRate = 8900;   // Move around original position slightly.
+const int PointMutationRateBase = 10000;
+
+const int BrushBlueMutationRate = 1;
+const int BrushGreenMutationRate = 1;
+const int BrushRedMutationRate = 1;
+const int BrushAlphaMutationRate = 1;
+
 
 // Structure settings.
-const int PolygonInitRange = 0;      // Limits a polygon to 1px to raise its survival probability.
+const int PolygonInitRange = 1;      // Limits a polygon to 1px to raise its survival probability.
 const int PointsPerPolygonMax = 10;
 const int PointsPerPolygonMin = 3;
 const int PointsPerCanvasMax = 1500;

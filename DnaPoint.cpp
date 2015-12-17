@@ -24,14 +24,15 @@ void DnaPoint::Random()
 // 3. MinMutation, moves slightly (~3px) around current position.
 void DnaPoint::Mutate(DnaCanvas& canvas)
 {
-	// Max movement
-	if (tools::WillMutate(settings::PointMaxMutationRate)) {
+	int prob = tools::GetRandomNumber(0, settings::PointMutationRateBase);
+	int cut1 = settings::PointMaxMutationRate;
+	int cut2 = cut1 + settings::PointMidMutationRate;
+	int cut3 = cut2 + settings::PointMinMutationRate;
+	if (prob < cut1) {
 		x = tools::GetRandomNumber(0, settings::MaxWidth);
 		y = tools::GetRandomNumber(0, settings::MaxHeight);
 		canvas.SetDirty();
-	};
-	// Mid movement
-	if (tools::WillMutate(settings::PointMidMutationRate)) {
+	} else if (prob < cut2) {
 		int mutationRange = settings::PointMidMutationRange;
 		x += tools::GetRandomNumber(-mutationRange, mutationRange + 1);
 		y += tools::GetRandomNumber(-mutationRange, mutationRange + 1);
@@ -39,9 +40,7 @@ void DnaPoint::Mutate(DnaCanvas& canvas)
 		x = std::min(std::max(0, x), settings::MaxWidth - 1);
 		y = std::min(std::max(0, y), settings::MaxHeight - 1);
 		canvas.SetDirty();
-	};
-	// Min movement
-	if (tools::WillMutate(settings::PointMinMutationRate)) {
+	} else if (prob < cut3) {
 		int mutationRange = settings::PointMinMutationRange;
 		x += tools::GetRandomNumber(-mutationRange, mutationRange + 1);
 		y += tools::GetRandomNumber(-mutationRange, mutationRange + 1);

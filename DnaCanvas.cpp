@@ -59,13 +59,15 @@ int DnaCanvas::PointCount() const
 // The number of polygons in a single canvas is limited in settings.h.
 void DnaCanvas::Mutate()
 {
-	if (tools::WillMutate(settings::CanvasAddPolygonRate)) AddPolygon();
-	if (tools::WillMutate(settings::CanvasRemovePolygonRate)) RemovePolygon();
-	if (tools::WillMutate(settings::CanvasMovePolygonRate)) MovePolygon();
-	// Mutate each polygon after adding /removing polygon.
-	for (auto& polygon : *polygons) {
-		polygon.Mutate(*this);
-	};
+	int prob = tools::GetRandomNumber(0, settings::CanvasMutationRateBase);
+	int cut1 = settings::CanvasAddPolygonRate;
+	int cut2 = cut1 + settings::CanvasRemovePolygonRate;
+	int cut3 = cut2 + settings::CanvasMovePolygonRate;
+	int cut4 = cut3 + settings::CanvasMutatePolygonRate;
+	if (prob < cut1) { AddPolygon(); }
+	else if (prob < cut2) { RemovePolygon(); }
+	else if (prob < cut3) { MovePolygon(); }
+	else if (prob < cut4) { MutatePolygon(); };
 }
 
 void DnaCanvas::AddPolygon()
@@ -97,5 +99,12 @@ void DnaCanvas::MovePolygon()
 	int index_insert = tools::GetRandomNumber(0, polygons->size());
 	polygons->insert(polygons->begin() + index_insert, poly);
 
+	SetDirty();
+}
+
+void DnaCanvas::MutatePolygon()
+{
+	int index_mutate = tools::GetRandomNumber(0, polygons->size());
+	(*polygons)[index_mutate].Mutate(*this);
 	SetDirty();
 }

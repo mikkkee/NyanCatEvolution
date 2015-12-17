@@ -25,5 +25,7 @@ public:
 private:
 	void AddPoint(DnaCanvas& canvas);
 	void RemovePoint(DnaCanvas& canvas);
+	void MutatePoint(DnaCanvas& canvas);
+	void MutateBrush(DnaCanvas& canvas);
 };
 #endif
