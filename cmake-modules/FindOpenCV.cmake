@@ -48,9 +48,10 @@
 #----------------------------------------------------------
 
 
-find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV")
+find_path(OpenCV_DIR "OpenCVConfig.cmake" PATHS ENV OPENCV_DIR DOC "Root directory of OpenCV")
 
 set(OpenCV_configScript "${OpenCV_DIR}/OpenCVConfig.cmake")
+message(STATUS "OpenCV_configScript: ${OpenCV_configScript}")
 
 if(NOT EXISTS "${OpenCV_DIR}")
   if(NOT WIN32)
