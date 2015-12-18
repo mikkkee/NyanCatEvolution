@@ -20,7 +20,6 @@ else(MSVC)
     include(FindPkgConfig)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(OPENCV REQUIRED opencv)
-
     if (NOT OPENCV_FOUND)
         message(FATAL_ERROR "OpenCV not found")
     endif()
