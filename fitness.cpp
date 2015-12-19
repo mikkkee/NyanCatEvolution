@@ -4,14 +4,17 @@
 #include "renderer.h"
 #include "settings.h"
 
-// Initializes Fitness object with its plot & polygonPlot data member 
-// to avoid creating/destroying Mat repeatly.
-// plot and polygonPlot act as buffer holder when rendering canvas and 
-// polygons in canvas.
+// By using plot & subplot, we are able to avoid 
+// creating/destroying Mat repeatly.
+// plot and subplot act as buffer holders when rendering canvas.
 Fitness::Fitness(const std::string& target_name) :
+original_height(),
+original_width(),
 plot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType)),
 subplot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType)),
-target(cv::imread(target_name))
+target(cv::imread(target_name)),
+target_data(nullptr),
+plot_data(nullptr)
 {
 	original_height = target.rows;
 	original_width = target.cols;
@@ -19,10 +22,9 @@ target(cv::imread(target_name))
 }
 
 // Calculates fitness score between canvas and target.
-// Uses a pointer to Mat.data to speedup scann in target Mat.
-// Uses a pointer to BitmapData to speedup scan in rendered Bitmap image.
-// bm is used to plot canvas on it.
-// graph manages operations on bm.
+// Uses pointers to Mat.data to speedup scann over all pixels.
+// opaque determines whether the opaque rendering method should be used.
+// non-opaque rendering method is not supported currently at 19 Dec 2015.
 double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 {
 	if (opaque) {
@@ -34,18 +36,18 @@ double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 	ResetPlotDataPtr();
 	double score = 0;
 	// Applies penalty for too much polygons.
-	// Less polygons means less calculation.
+	// Less polygons means less time on rendering.
 	score += canvas.polygons->size();
 	for (int y = 0; y < settings::MaxHeight; ++y) {
 		for (int x = 0; x < settings::MaxWidth; ++x) {
 			// Target is a unsigned char * pointed to the array
 			// of three channel pixel values.
-			int target_blue = static_cast<int>(*target_data++);
-			int target_green = static_cast<int>(*target_data++);
-			int target_red = static_cast<int>(*target_data++);
-			int plot_blue = static_cast<int>(*plot_data++);
-			int plot_green = static_cast<int>(*plot_data++);
-			int plot_red = static_cast<int>(*plot_data++);
+			int target_blue = *target_data++;
+			int target_green = *target_data++;
+			int target_red = *target_data++;
+			int plot_blue = *plot_data++;
+			int plot_green = *plot_data++;
+			int plot_red = *plot_data++;
 
 			int r = plot_red - target_red;
 			int g = plot_green - target_green;
@@ -56,11 +58,12 @@ double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 	return score;
 }
 
+// Converts target mat's datatype and resizes it to specified size.
 void Fitness::ResizeTarget()
 {
 	assert(target.data);
 	target.convertTo(target, settings::CanvasMatDataType);
-	// Resize target image to:
+	// Benefit of resizing:
 	// 1. Reduce calculations if image is too large.
 	// 2. Fixed canvas range makes it easier when generating random points.
 	cv::resize(target, target, cv::Size(settings::MaxHeight, settings::MaxWidth));
@@ -68,16 +71,16 @@ void Fitness::ResizeTarget()
 
 void Fitness::ResetTargetDataPtr()
 {
-	// Get a pointer to pixel arrays to target Mat's transposition.
-	// The Mat should be continuous to allow one pointer to scan whole data.
+	// Get a pointer to pixel arrays of target mat.
+	// The data should be continuous to allow pointer arithmethic when scanning.
 	assert(target.isContinuous());
 	target_data = target.data;
 }
 
 void Fitness::ResetPlotDataPtr()
 {
-	// Get a pointer to pixel arrays to target Mat's transposition.
-	// The Mat should be continuous to allow one pointer to scan whole data.
+	// Get a pointer to pixel arrays of plot mat.
+	// The data should be continuous to allow pointer arithmethic when scanning.
 	assert(plot.isContinuous());
 	plot_data = plot.data;
 }
