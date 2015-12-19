@@ -13,9 +13,9 @@ public:
 	DnaBrush * Clone();
 	void Mutate(DnaCanvas& canvas);
 
-	int alpha;
-	int red;
-	int green;
 	int blue;
+	int green;
+	int red;
+	int alpha;
 };
 #endif

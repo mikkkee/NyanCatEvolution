@@ -5,18 +5,18 @@
 #include "tools.h"
 #include "settings.h"
 
-DnaCanvas::DnaCanvas()
+DnaCanvas::DnaCanvas() :
+is_dirty(true),
+polygons()
 {
 	polygons = new std::vector < DnaPolygon >;
 	for (int i = 0; i < settings::PolygonsPerCanvasMin; i++) {
 		AddPolygon();
 	};
-	SetDirty();
 }
 
 DnaCanvas::DnaCanvas(DnaCanvas& canvas)
 {
-	// Copy polygons.
 	polygons = new std::vector < DnaPolygon >;
 	for (auto& polygon : *(canvas.polygons)) {
 		polygons->push_back(polygon);
@@ -29,7 +29,6 @@ DnaCanvas::~DnaCanvas() { delete polygons; }
 DnaCanvas& DnaCanvas::operator=(const DnaCanvas& canvas)
 {
 	if (this != &canvas) {
-		// Copy polygons.
 		delete polygons;
 		polygons = new std::vector < DnaPolygon >;
 		for (auto& polygon : *(canvas.polygons)) {
@@ -55,8 +54,9 @@ int DnaCanvas::PointCount() const
 // 1. Add a polygon.
 // 2. Remove a polygon.
 // 3. Move the order of its polygons.
-// 4. Mutate its polygons.
+// 4. Mutate one of its polygons.
 // The number of polygons in a single canvas is limited in settings.h.
+// The mutation rates for each kind of mutation are defined in settings.h.
 void DnaCanvas::Mutate()
 {
 	int prob = tools::GetRandomNumber(0, settings::CanvasMutationRateBase);

@@ -62,7 +62,7 @@ DnaPolygon& DnaPolygon::operator=(const DnaPolygon& polygon)
 
 int DnaPolygon::Count() const { return points->size(); }
 
-DnaPolygon * DnaPolygon::Clone()
+DnaPolygon* DnaPolygon::Clone()
 {
 	DnaPolygon * polygon = new DnaPolygon;
 	// Copy points.
@@ -76,6 +76,11 @@ DnaPolygon * DnaPolygon::Clone()
 	return polygon;
 }
 
+// DnaPolygon can mutate in the following ways:
+// 1. Add a point, on polygon's edge to avoid destroying the polygon.
+// 2. Remove a point.
+// 3. Move around a point.
+// 4. Change the brush color.
 void DnaPolygon::Mutate(DnaCanvas& canvas)
 {
 	int prob = tools::GetRandomNumber(0, settings::PolygonMutationRateBase);
@@ -95,7 +100,7 @@ void DnaPolygon::AddPoint(DnaCanvas& canvas)
 	if (this->Count() < settings::PointsPerPolygonMax) {
 		if (canvas.PointCount() < settings::PointsPerCanvasMax) {
 			// Add new point between two neighbouring points to keep a convex shape
-			// and minimum change in rendered image.
+			// and minimize the change in rendered image.
 			int index = tools::GetRandomNumber(1, points->size());
 			DnaPoint point(
 				((*points)[index - 1].x + (*points)[index].x) / 2,

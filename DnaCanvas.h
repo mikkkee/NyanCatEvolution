@@ -16,7 +16,7 @@ public:
 	int PointCount() const;
 	void Mutate();
 
-	bool is_dirty;  // A polygon is dirty after a successful mutation.
+	bool is_dirty;                      // A polygon gets dirty after a successful mutation.
 	std::vector<DnaPolygon> *polygons;  // List of polygons.
 
 private:

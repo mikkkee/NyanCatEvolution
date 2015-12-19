@@ -16,11 +16,11 @@ public:
 	DnaPolygon& operator=(const DnaPolygon& polygon);
 
 	int Count() const;  // Number of points.
-	DnaPolygon * Clone();
+	DnaPolygon* Clone();
 	void Mutate(DnaCanvas& canvas);
 
-	std::vector<DnaPoint> *points;  // List of points.
-	DnaBrush *brush;                // Fill color - (b, g, r, a).
+	std::vector<DnaPoint>* points;  // List of points.
+	DnaBrush* brush;                // Fill color - (b, g, r, a).
 
 private:
 	void AddPoint(DnaCanvas& canvas);
