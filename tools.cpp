@@ -18,6 +18,7 @@ plot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataTyp
 subplot(cv::Mat(settings::MaxHeight, settings::MaxWidth, settings::CanvasMatDataType))
 {}
 
+// Resize the size of plot and subplot; Render canvas using them; save plot to image.
 void SaveTool::SaveCanvasAsImage(const std::string& filename, const DnaCanvas& canvas,
 	const double scale_x, const double scale_y, bool opaque)
 {
@@ -46,14 +47,14 @@ void StartEvolution(const std::string& target_name)
 	Fitness fitness(target_name);
 	const double scale_x = static_cast<double>(fitness.original_width) / settings::MaxWidth;
 	const double scale_y = static_cast<double>(fitness.original_height) / settings::MaxHeight;
+	// Use opaque polygons if and only if alpha is fixed to 255 in settings.h.
 	bool opaque = (settings::BrushAlphaMutationHigh == settings::BrushAlphaMutationLow) &&
-		(settings::BrushAlphaMutationHigh == 255);  // Use opaque polygons if alpha is fixed to 255.
+		(settings::BrushAlphaMutationHigh == 255);
 	tools::SaveTool save_tool;
 
 	DnaCanvas parent;
 	int population = 0;    // Count of mutated DNAs.
 	int selected = 0;      // Count of "good" mutated DNAs.
-	bool written = false;  // Whether parent has been written to disk.
 	double current_score = fitness.GetFitness(parent, opaque);
 	double next_score = 0.0;
 
@@ -64,62 +65,25 @@ void StartEvolution(const std::string& target_name)
 		if (offspring.is_dirty) {
 			population++;
 			next_score = fitness.GetFitness(offspring, opaque);
-
 			if (next_score <= current_score) {
 				selected++;
-				written = false;
 				parent = offspring;
 				current_score = next_score;
+				// Dumps "good" mutated DNAs.
+				if (selected % settings::DumpFrequency == 0) {
+					ostringstream name;
+					name << settings::DumpPrefix << selected << settings::DumpExtension;
+					save_tool.SaveCanvasAsImage(name.str(), parent, scale_x, scale_y, opaque);
+				};
 			};
 			if (population % settings::ConsoleLogFrequency == 0) {
 				tools::PrintEvolution(population, selected, current_score, parent);
 			};
-			if (population % settings::FileLogFrequency == 0) {
+			if (settings::FileLog && population % settings::FileLogFrequency == 0) {
 				tools::WriteLog(population, selected, current_score);
 			};
 		};
-		// Dumps "gooded" mutated images.
-		if ((selected % settings::DumpFrequency == 0) && !written) {
-			ostringstream name;
-			name << settings::DumpPrefix << selected << settings::DumpExtension;
-			save_tool.SaveCanvasAsImage(name.str(), parent, scale_x, scale_y, opaque);
-			written = true;
-		};
 	};
-}
-
-// Prepare the Mat object loaded from target image for fitness calculation:
-// 1. Validates it data to ensure a successful load.
-// 2. Converts its DataType to what Settings specifies.
-// 3. Resizes it to speed up fitness calculation.
-// 4. Returns a pointer to the beginning of its data for fast scan accross all pixels.
-//
-// The return pointer points to the beginning of target Mat's data array.
-//
-// This function can fail if !target.isContinuous().
-const unsigned char* const PrepareTarget(cv::Mat& target)
-{
-	assert(target.data);
-	target.convertTo(target, settings::CanvasMatDataType);
-	// Resize target image to:
-	// 1. Reduce calculations if image is too large.
-	// 2. Fixed canvas range makes it easier when generating random points.
-	cv::resize(target, target, cv::Size(settings::MaxHeight, settings::MaxWidth));
-
-	// Get a pointer to pixel arrays to target Mat's transposition.
-	// The Mat should be continuous to allow one pointer to scan whole data.
-	assert(target.isContinuous());
-	const unsigned char* const target_ptr = target.data;
-	return target_ptr;
-}
-
-void DumpCanvas(const DnaCanvas& canvas, const int selected,
-	cv::Mat& plot, const double scale_x, const double scale_y)
-{
-	std::ostringstream img_name;
-	img_name << settings::DumpPrefix << selected << settings::DumpExtension;
-	renderer::SaveCanvasToImageAs(canvas, img_name.str(),
-		plot, scale_x, scale_y);
 }
 
 void RandInit() { srand(time(NULL)); };
@@ -131,14 +95,6 @@ int GetRandomNumber(const int min, const int max)
 	return (rand() % (max - min)) + min;
 }
 
-bool WillMutate(const int mutation_rate)
-{
-	// A mutation rate of 1 should always be true.
-	if (mutation_rate == 1) return true;
-	if (GetRandomNumber(0, mutation_rate) == 1) return true;
-	return false;
-}
-
 void PrintPoint(const DnaPoint& point)
 {
 	std::cout << "(" << point.x << ", " << point.y << ") ";
@@ -146,7 +102,7 @@ void PrintPoint(const DnaPoint& point)
 
 void PrintPolygon(const DnaPolygon& polygon)
 {
-	std::cout << "    Polygons("
+	std::cout << "    Polygon("
 		<< polygon.points->size()
 		<< "):\n        ";
 	for (auto& point : *(polygon.points)) {
