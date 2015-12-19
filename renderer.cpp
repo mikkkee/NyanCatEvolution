@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include <stdexcept>
 #include "DnaPoint.h"
 #include "settings.h"
 
@@ -6,39 +7,36 @@ namespace renderer{
 // Renders image by using opaque polygons.
 void Render(const DnaCanvas& canvas, cv::Mat& plot)
 {
-	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
-	for (auto & polygon : *canvas.polygons) {
-		RenderPolygon(polygon, plot, 1.0, 1.0);
-	};
+	Render(canvas, plot, 1.0, 1.0);  // Calls opaque version with scale factor 1.0.
 }
+
 // Renders image by using opaque polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
 	const double scale_x, const double scale_y)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
-	for (auto & polygon : *canvas.polygons) {
+	for (auto& polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, scale_x, scale_y);
 	};
 }
 
+// Renders image by using semi-transparent polygons.
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot)
 {
-	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
-	for (auto & polygon : *canvas.polygons) {
-		RenderPolygon(polygon, plot, subplot, 1.0, 1.0);
-	};
+	Render(canvas, plot, subplot, 1.0, 1.0); // Calls non-opaque version with scale factor 1.0.
 }
 
+// Renders image by using semi-transparent polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot,
 	const double scale_x, const double scale_y)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
-	for (auto & polygon : *canvas.polygons) {
+	for (auto& polygon : *canvas.polygons) {
 		RenderPolygon(polygon, plot, subplot, scale_x, scale_y);
 	};
 }
 
-// Renders opaque polygon.
+// Renders a opaque polygon to plot.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 	const double scale_x, const double scale_y)
 {
@@ -50,9 +48,14 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 	delete points_vec;  // Releases vector allocated by new.
 }
 
+// Renders a semi-transparent, i.e. non-opaque, polygon to plot.
+// Firstly the polygon is rendered on subplot, then subplot is blended with plot by
+// using alpha composition method: composite subplot over plot.
+// Todo: implement high efficiency alpha composition strategy.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
 	const double scale_x, const double scale_y)
 {
+	throw std::runtime_error("Non-opaque rendering method does not work currently!");
 	subplot.setTo(cv::Scalar(0, 0, 0));
 	cv::Scalar brush = GetPolygonBrush(polygon);
 	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
@@ -66,11 +69,11 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
 cv::Scalar GetPolygonBrush(
 	const DnaPolygon& polygon)
 {
-	double alpha = static_cast<double>(polygon.brush->alpha) / 255;
-	int red = polygon.brush->red * alpha;
-	int green = polygon.brush->green * alpha;
-	int blue = polygon.brush->blue * alpha;
-	return cv::Scalar(blue, green, red, 255);
+	int alpha = polygon.brush->alpha;
+	int red = polygon.brush->red;
+	int green = polygon.brush->green;
+	int blue = polygon.brush->blue;
+	return cv::Scalar(blue, green, red, alpha);
 }
 
 std::vector<cv::Point>* GetPolygonPointsVector(
@@ -90,7 +93,6 @@ void SaveCanvasToImageAs(
 	const DnaCanvas& canvas, const std::string& filename, cv::Mat& plot,
 	const double scale_x, const double scale_y)
 {
-	// Convert std::string to System::String.
 	Render(canvas, plot, scale_x, scale_y);
 	cv::imwrite(filename, plot);
 }
