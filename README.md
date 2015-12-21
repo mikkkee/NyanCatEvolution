@@ -35,9 +35,9 @@ cd build
 cmake ..
 ```
 
-[1]: http://i.imgur.com/RSfGBLn.gif
+[1]: http://i.imgur.com/44nbuYn.gif
 [2]: http://i.imgur.com/klT9PqQ.png
-[3]: http://i.imgur.com/USYuNne.png
+[3]: http://i.imgur.com/3llDpDu.png
 [4]: http://rogeralsing.com/2008/12/07/genetic-programming-evolution-of-mona-lisa/
 [5]: MSVS.Setup.md
 [6]: https://cmake.org/
