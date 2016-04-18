@@ -40,7 +40,7 @@ cmake ..
 1. Change directory to where the compiled executable file is.
 2. `mkdir selected` to hold selected children images.
 3. Copy target image to current directory and rename it to `a.png`.
-4. Run executable and wait for good things to happen ?:smile_cat:?.
+4. Run executable and wait for good things to happen :smile_cat:.
 
 [1]: http://i.imgur.com/44nbuYn.gif
 [2]: http://i.imgur.com/klT9PqQ.png
