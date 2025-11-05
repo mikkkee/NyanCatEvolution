@@ -51,19 +51,22 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 // Renders a semi-transparent, i.e. non-opaque, polygon to plot.
 // Firstly the polygon is rendered on subplot, then subplot is blended with plot by
 // using alpha composition method: composite subplot over plot.
-// Todo: implement high efficiency alpha composition strategy.
+// Uses efficient alpha blending: output = alpha * foreground + (1 - alpha) * background
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
 	const double scale_x, const double scale_y)
 {
-	throw std::runtime_error("Non-opaque rendering method does not work currently!");
-	subplot.setTo(cv::Scalar(0, 0, 0));
+	subplot.setTo(cv::Scalar(0, 0, 0, 0));  // Clear subplot with transparent background.
 	cv::Scalar brush = GetPolygonBrush(polygon);
 	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
 	cv::Point* points = &((*points_vec)[0]);
 	int n = static_cast<int>(polygon.points->size());
-	cv::fillConvexPoly(subplot, points, n, brush, 16);  // Plot polygon.
-	cv::add(plot, subplot, plot);                       // Blend polygon with canvas.
-	delete points_vec;                                  // Releases vector allocated by new.
+	cv::fillConvexPoly(subplot, points, n, brush, 16);  // Plot polygon on subplot.
+
+	// Alpha blending: blend subplot with plot using the polygon's alpha value.
+	double alpha = polygon.brush->alpha / 255.0;  // Normalize alpha to [0, 1].
+	cv::addWeighted(subplot, alpha, plot, 1.0 - alpha, 0, plot);
+
+	delete points_vec;  // Releases vector allocated by new.
 }
 
 cv::Scalar GetPolygonBrush(
