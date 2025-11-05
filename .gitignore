@@ -178,6 +178,9 @@ compile_commands.json
 build.ninja
 rules.ninja
 
+#cmake build directory
+build/
+
 #xcode stuff
 *.pbxuser
 *.perspective
