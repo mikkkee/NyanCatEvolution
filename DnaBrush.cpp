@@ -1,4 +1,5 @@
 #include "DnaBrush.h"
+#include <algorithm>
 #include "DnaCanvas.h"
 #include "settings.h"
 #include "tools.h"
@@ -13,15 +14,6 @@ settings::BrushRedMutationLow, settings::BrushRedMutationHigh + 1)),
 alpha(tools::GetRandomNumber(
 settings::BrushAlphaMutationLow, settings::BrushAlphaMutationHigh + 1))
 {}
-
-DnaBrush* DnaBrush::Clone(){
-	DnaBrush * brush = new DnaBrush;
-	brush->blue = blue;
-	brush->green = green;
-	brush->red = red;
-	brush->alpha = alpha;
-	return brush;
-}
 
 // Mutates color values.
 // RGB values are mutated around current values.

@@ -2,7 +2,7 @@
 #define EVOART_DNA_SETTINGS_H_
 
 #include <string>
-#include <opencv/cv.hpp>
+#include <opencv2/core.hpp>
 
 namespace settings
 {
@@ -11,8 +11,15 @@ const int DumpFrequency = 1000;  // Sets frequency of snapshot saving.
 const int ConsoleLogFrequency = 50;     // Sets frequency of console output.
 const std::string DumpPrefix = "selected/";
 const std::string DumpExtension = ".png";
-const int FitConvergence = 1000;
-const int FileLog = true;
+// Stops when fitness score drops below FitConvergence.
+// The score is the sum of absolute per-channel differences over all pixels,
+// so its scale depends on MaxWidth * MaxHeight * 3. The default corresponds
+// to an average error of ~3 per channel per pixel on a 200x200 canvas.
+const double FitConvergence = 360000;
+// Hard cap on the number of mutations, so a run always terminates even if
+// FitConvergence turns out to be unreachable for a given target.
+const long long MaxGenerations = 5000000;
+const bool FileLog = true;
 const int FileLogFrequency = 1000;
 
 // Rendering settings.
@@ -66,7 +73,7 @@ const int PolygonsPerCanvasMin = 1;
 
 // Mutation range.
 const int ColorMutationRange = 5;
-const int PointMidMutationRange = 5;
+const int PointMidMutationRange = 20;
 const int PointMinMutationRange = 5;
 const int BrushBlueMutationLow = 0;
 const int BrushBlueMutationHigh = 255;

@@ -1,10 +1,13 @@
 #include "fitness.h"
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include "renderer.h"
 #include "settings.h"
 
-// By using plot & subplot, we are able to avoid 
+// By using plot & subplot, we are able to avoid
 // creating/destroying Mat repeatly.
 // plot and subplot act as buffer holders when rendering canvas.
 Fitness::Fitness(const std::string& target_name) :
@@ -37,7 +40,7 @@ double Fitness::GetFitness(const DnaCanvas& canvas ,bool opaque)
 	double score = 0;
 	// Applies penalty for too much polygons.
 	// Less polygons means less time on rendering.
-	score += canvas.polygons->size();
+	score += canvas.polygons.size();
 	for (int y = 0; y < settings::MaxHeight; ++y) {
 		for (int x = 0; x < settings::MaxWidth; ++x) {
 			// Target is a unsigned char * pointed to the array
@@ -66,7 +69,7 @@ void Fitness::ResizeTarget()
 	// Benefit of resizing:
 	// 1. Reduce calculations if image is too large.
 	// 2. Fixed canvas range makes it easier when generating random points.
-	cv::resize(target, target, cv::Size(settings::MaxHeight, settings::MaxWidth));
+	cv::resize(target, target, cv::Size(settings::MaxWidth, settings::MaxHeight));
 }
 
 void Fitness::ResetTargetDataPtr()

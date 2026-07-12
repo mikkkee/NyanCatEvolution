@@ -190,3 +190,5 @@ rules.ninja
 *.xccheckout
 *.ycm_root
 *.build
+# CMake build directory
+build/

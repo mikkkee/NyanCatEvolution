@@ -6,11 +6,6 @@
 
 DnaPoint::DnaPoint(int x, int y) : x(x), y(y) {}
 
-DnaPoint* DnaPoint::Clone() const 
-{
-	return new DnaPoint(x, y);
-}
-
 void DnaPoint::Random()
 {
 	x = tools::GetRandomNumber(0, settings::MaxWidth);

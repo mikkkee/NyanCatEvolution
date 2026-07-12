@@ -8,7 +8,7 @@ NyanCatEvolution is inspired by [EvoLisa][4], it implements a genetic algorithm
 to mock up target image by ploting opaque polygons on a canvas.
 
 ## Features
-* Implemented in C++ with OpenCV 2.4.
+* Implemented in C++ with OpenCV (3.x/4.x).
 * Uses opaque polygons instead of semi-transparent polygons to speed up mutation
   step (Semi-transparent polygon support to be added).
 * Generic algorithm paremeters are optimized to favor many small changes over
@@ -22,8 +22,9 @@ to mock up target image by ploting opaque polygons on a canvas.
 * Useful tools for printing canvas and log convergence details.
 
 ## Install
-1. Install OpenCV 2.4 and set up environmental variables as [MSVS.Setup.md][5]
-     documented if you are using Windows.
+1. Install OpenCV (3.x or 4.x). On Debian/Ubuntu: `apt install libopencv-dev`.
+   On Windows, download the official OpenCV package and pass its build
+   directory to CMake via `-DOpenCV_DIR=<path>` (see [MSVS.Setup.md][5]).
 2. Install [CMake][6].
 3. Run the following commands in `bash` or `cmd`. You'll have either an executable
    or a Visual Studio Project.
@@ -33,6 +34,7 @@ cd NyanCatEvolution
 mkdir build
 cd build
 cmake ..
+cmake --build .
 ```
 
 ## Usage

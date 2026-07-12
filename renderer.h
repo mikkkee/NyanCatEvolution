@@ -3,8 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <opencv/cv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>
 #include "DnaBrush.h"
 #include "DnaCanvas.h"
 #include "DnaPolygon.h"
@@ -36,7 +35,7 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
 cv::Scalar GetPolygonBrush(const DnaPolygon& polygon);
 
 // Returns a vector that contains all points of a DnaPolygon in cv::Point format.
-std::vector<cv::Point>* GetPolygonPointsVector(const DnaPolygon& polygon,
+std::vector<cv::Point> GetPolygonPointsVector(const DnaPolygon& polygon,
 	const double scale_x, const double scale_y);
 
 // Saves a canvas to an image of given name. scale_x and scale_y are scale factors.
