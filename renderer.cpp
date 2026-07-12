@@ -14,11 +14,11 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot)
 
 // Renders image by using opaque polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
 	for (auto& polygon : canvas.polygons) {
-		RenderPolygon(polygon, plot, scale_x, scale_y);
+		RenderPolygon(polygon, plot, scale_x, scale_y, line_type);
 	};
 }
 
@@ -30,22 +30,22 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot)
 
 // Renders image by using semi-transparent polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
 	for (auto& polygon : canvas.polygons) {
-		RenderPolygon(polygon, plot, subplot, scale_x, scale_y);
+		RenderPolygon(polygon, plot, subplot, scale_x, scale_y, line_type);
 	};
 }
 
 // Renders a opaque polygon to plot.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	cv::Scalar brush = GetPolygonBrush(polygon);
 	std::vector<cv::Point> points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
 	int n = static_cast<int>(points_vec.size());
-	cv::fillConvexPoly(plot, points_vec.data(), n, brush, cv::LINE_8);
+	cv::fillConvexPoly(plot, points_vec.data(), n, brush, line_type);
 }
 
 // Renders a semi-transparent, i.e. non-opaque, polygon to plot.
@@ -53,7 +53,7 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 // using alpha composition method: composite subplot over plot.
 // Todo: implement high efficiency alpha composition strategy.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	throw std::runtime_error("Non-opaque rendering method does not work currently!");
 }

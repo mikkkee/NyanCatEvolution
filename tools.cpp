@@ -1,6 +1,7 @@
 #include "tools.h"
 #include <ctime>
 #include <cassert>
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -37,13 +38,17 @@ void SaveTool::SaveCanvasAsImage(const std::string& filename, const DnaCanvas& c
 	cv::Size size(settings::MaxWidth * scale_x, settings::MaxHeight * scale_y);
 	cv::resize(plot, plot, size);
 	cv::resize(subplot, subplot, size);
+	// Saved images are for viewing, so render them anti-aliased; fitness
+	// rendering keeps cv::LINE_8 for speed and a noise-free selection signal.
 	if (opaque) {
-		renderer::Render(canvas, plot, scale_x, scale_y);
+		renderer::Render(canvas, plot, scale_x, scale_y, cv::LINE_AA);
 	}
 	else {
-		renderer::Render(canvas, plot, subplot, scale_x, scale_y);
+		renderer::Render(canvas, plot, subplot, scale_x, scale_y, cv::LINE_AA);
 	};
-	cv::imwrite(filename, plot);
+	if (!cv::imwrite(filename, plot)) {
+		std::cerr << "Failed to save snapshot to " << filename << std::endl;
+	};
 }
 
 // Starts an evolution run.
@@ -56,6 +61,11 @@ void StartEvolution(const std::string& target_name)
 	using namespace cv;
 
 	RandInit();  // Sets random seed.
+	// Snapshots are dumped into DumpPrefix; make sure it exists, since
+	// cv::imwrite does not create parent directories.
+	if (!settings::DumpPrefix.empty()) {
+		std::filesystem::create_directories(settings::DumpPrefix);
+	};
 	Fitness fitness(target_name);
 	const double scale_x = static_cast<double>(fitness.original_width) / settings::MaxWidth;
 	const double scale_y = static_cast<double>(fitness.original_height) / settings::MaxHeight;
