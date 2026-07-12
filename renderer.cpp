@@ -1,5 +1,7 @@
 #include "renderer.h"
 #include <stdexcept>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include "DnaPoint.h"
 #include "settings.h"
 
@@ -12,11 +14,11 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot)
 
 // Renders image by using opaque polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
-	for (auto& polygon : *canvas.polygons) {
-		RenderPolygon(polygon, plot, scale_x, scale_y);
+	for (auto& polygon : canvas.polygons) {
+		RenderPolygon(polygon, plot, scale_x, scale_y, line_type);
 	};
 }
 
@@ -28,24 +30,22 @@ void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot)
 
 // Renders image by using semi-transparent polygons with scale factors.
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	plot.setTo(cv::Scalar(0, 0, 0));  // Reset the image color.
-	for (auto& polygon : *canvas.polygons) {
-		RenderPolygon(polygon, plot, subplot, scale_x, scale_y);
+	for (auto& polygon : canvas.polygons) {
+		RenderPolygon(polygon, plot, subplot, scale_x, scale_y, line_type);
 	};
 }
 
 // Renders a opaque polygon to plot.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	cv::Scalar brush = GetPolygonBrush(polygon);
-	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
-	cv::Point* points = &((*points_vec)[0]);
-	int n = static_cast<int>(polygon.points->size());
-	cv::fillConvexPoly(plot, points, n, brush, 16);
-	delete points_vec;  // Releases vector allocated by new.
+	std::vector<cv::Point> points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
+	int n = static_cast<int>(points_vec.size());
+	cv::fillConvexPoly(plot, points_vec.data(), n, brush, line_type);
 }
 
 // Renders a semi-transparent, i.e. non-opaque, polygon to plot.
@@ -53,38 +53,31 @@ void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
 // using alpha composition method: composite subplot over plot.
 // Todo: implement high efficiency alpha composition strategy.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
-	const double scale_x, const double scale_y)
+	const double scale_x, const double scale_y, const int line_type)
 {
 	throw std::runtime_error("Non-opaque rendering method does not work currently!");
-	subplot.setTo(cv::Scalar(0, 0, 0));
-	cv::Scalar brush = GetPolygonBrush(polygon);
-	std::vector<cv::Point>* points_vec = GetPolygonPointsVector(polygon, scale_x, scale_y);
-	cv::Point* points = &((*points_vec)[0]);
-	int n = static_cast<int>(polygon.points->size());
-	cv::fillConvexPoly(subplot, points, n, brush, 16);  // Plot polygon.
-	cv::add(plot, subplot, plot);                       // Blend polygon with canvas.
-	delete points_vec;                                  // Releases vector allocated by new.
 }
 
 cv::Scalar GetPolygonBrush(
 	const DnaPolygon& polygon)
 {
-	int alpha = polygon.brush->alpha;
-	int red = polygon.brush->red;
-	int green = polygon.brush->green;
-	int blue = polygon.brush->blue;
+	int alpha = polygon.brush.alpha;
+	int red = polygon.brush.red;
+	int green = polygon.brush.green;
+	int blue = polygon.brush.blue;
 	return cv::Scalar(blue, green, red, alpha);
 }
 
-std::vector<cv::Point>* GetPolygonPointsVector(
+std::vector<cv::Point> GetPolygonPointsVector(
 	const DnaPolygon& polygon,
 	const double scaleX, const double scaleY)
 {
-	std::vector<cv::Point>* point_vec = new std::vector<cv::Point>;
-	for (auto& point : *polygon.points) {
+	std::vector<cv::Point> point_vec;
+	point_vec.reserve(polygon.points.size());
+	for (auto& point : polygon.points) {
 		int x = static_cast<int>(point.x * scaleX);
 		int y = static_cast<int>(point.y * scaleY);
-		point_vec->push_back(cv::Point(x, y));
+		point_vec.push_back(cv::Point(x, y));
 	};
 	return point_vec;
 }

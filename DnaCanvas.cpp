@@ -9,43 +9,20 @@ DnaCanvas::DnaCanvas() :
 is_dirty(true),
 polygons()
 {
-	polygons = new std::vector < DnaPolygon >;
 	for (int i = 0; i < settings::PolygonsPerCanvasMin; i++) {
 		AddPolygon();
 	};
 }
 
-DnaCanvas::DnaCanvas(DnaCanvas& canvas)
-{
-	polygons = new std::vector < DnaPolygon >;
-	for (auto& polygon : *(canvas.polygons)) {
-		polygons->push_back(polygon);
-	};
-	is_dirty = canvas.is_dirty;
-}
-
-DnaCanvas::~DnaCanvas() { delete polygons; }
-
-DnaCanvas& DnaCanvas::operator=(const DnaCanvas& canvas)
-{
-	if (this != &canvas) {
-		delete polygons;
-		polygons = new std::vector < DnaPolygon >;
-		for (auto& polygon : *(canvas.polygons)) {
-			polygons->push_back(polygon);
-		};
-		is_dirty = canvas.is_dirty;
-	};
-	return *this;
-}
-
 void DnaCanvas::SetDirty() { is_dirty = true; }
+
+void DnaCanvas::ClearDirty() { is_dirty = false; }
 
 int DnaCanvas::PointCount() const
 {
 	int count = 0;
-	for (auto& polygon : *polygons) {
-		count += polygon.points->size();
+	for (auto& polygon : polygons) {
+		count += polygon.points.size();
 	};
 	return count;
 };
@@ -72,39 +49,38 @@ void DnaCanvas::Mutate()
 
 void DnaCanvas::AddPolygon()
 {
-	if (polygons->size() < settings::PolygonsPerCanvasMax) {
+	if (polygons.size() < settings::PolygonsPerCanvasMax) {
 		DnaPolygon polygon;
-		polygons->push_back(polygon);
+		polygons.push_back(polygon);
 		SetDirty();
 	};
 }
 
 void DnaCanvas::RemovePolygon()
 {
-	if (polygons->size() > settings::PolygonsPerCanvasMin) {
-		int index = tools::GetRandomNumber(0, polygons->size());
-		polygons->erase(polygons->begin() + index);
+	if (polygons.size() > settings::PolygonsPerCanvasMin) {
+		int index = tools::GetRandomNumber(0, polygons.size());
+		polygons.erase(polygons.begin() + index);
 		SetDirty();
 	};
 }
 
 void DnaCanvas::MovePolygon()
 {
-	if (polygons->size() <= 1) return;
+	if (polygons.size() <= 1) return;
 
-	int index_rm = tools::GetRandomNumber(0, polygons->size());
-	DnaPolygon poly = (*polygons)[index_rm];
-	polygons->erase(polygons->begin() + index_rm);
+	int index_rm = tools::GetRandomNumber(0, polygons.size());
+	DnaPolygon poly = polygons[index_rm];
+	polygons.erase(polygons.begin() + index_rm);
 
-	int index_insert = tools::GetRandomNumber(0, polygons->size());
-	polygons->insert(polygons->begin() + index_insert, poly);
+	int index_insert = tools::GetRandomNumber(0, polygons.size());
+	polygons.insert(polygons.begin() + index_insert, poly);
 
 	SetDirty();
 }
 
 void DnaCanvas::MutatePolygon()
 {
-	int index_mutate = tools::GetRandomNumber(0, polygons->size());
-	(*polygons)[index_mutate].Mutate(*this);
-	SetDirty();
+	int index_mutate = tools::GetRandomNumber(0, polygons.size());
+	polygons[index_mutate].Mutate(*this);
 }

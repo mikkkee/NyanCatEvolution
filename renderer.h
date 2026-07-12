@@ -3,8 +3,8 @@
 
 #include <string>
 #include <vector>
-#include <opencv/cv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 #include "DnaBrush.h"
 #include "DnaCanvas.h"
 #include "DnaPolygon.h"
@@ -16,27 +16,34 @@ namespace renderer{
 // Renders by using semi-transparent polygon is two Mat plots are provided.
 // If scale_x and scale_y are present, this function scales points coordinations
 // by factor scale_x and scale_y before ploting canvas onto graph.
+// line_type follows cv::LineTypes: fitness rendering uses the default
+// cv::LINE_8 (faster, and keeps small mutations free of anti-aliasing noise);
+// images saved for viewing use cv::LINE_AA for smooth edges.
 void Render(const DnaCanvas& canvas, cv::Mat& plot);
 void Render(const DnaCanvas& canvas, cv::Mat& plot,
-	const double scale_x, const double scale_y);
+	const double scale_x, const double scale_y,
+	const int line_type = cv::LINE_8);
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot);
 void Render(const DnaCanvas& canvas, cv::Mat& plot, cv::Mat& subplot,
-	const double scale_x, const double scale_y);
+	const double scale_x, const double scale_y,
+	const int line_type = cv::LINE_8);
 
 // Plots a DnaPolygon object on to an image.
 // Renders using opaque or semi-transparent polygons determined by the presence of subplot.
 // Uses opaque ploygons if subplot is not provided.
 // scale_x and scale_y are used to scale the polygon before plotting.
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot,
-	const double scale_x, const double scale_y);
+	const double scale_x, const double scale_y,
+	const int line_type = cv::LINE_8);
 void RenderPolygon(const DnaPolygon& polygon, cv::Mat& plot, cv::Mat& subplot,
-	const double scale_x, const double scale_y);
+	const double scale_x, const double scale_y,
+	const int line_type = cv::LINE_8);
 
 // Returns a Scalar object which defines the same color as polygon's brush.
 cv::Scalar GetPolygonBrush(const DnaPolygon& polygon);
 
 // Returns a vector that contains all points of a DnaPolygon in cv::Point format.
-std::vector<cv::Point>* GetPolygonPointsVector(const DnaPolygon& polygon,
+std::vector<cv::Point> GetPolygonPointsVector(const DnaPolygon& polygon,
 	const double scale_x, const double scale_y);
 
 // Saves a canvas to an image of given name. scale_x and scale_y are scale factors.

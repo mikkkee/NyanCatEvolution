@@ -1,31 +1,18 @@
-project(NyanCatEvolution)
-cmake_minimum_required(VERSION 2.8.11.2)
+cmake_minimum_required(VERSION 3.10)
+project(NyanCatEvolution CXX)
 
-if (MSVC)
-    # Microsoft Visual Studio
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-    find_package(OpenCV REQUIRED)
-    if (NOT OpenCV_FOUND)
-        message(FATAL_ERROR "OpenCV not found")
-    endif()
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
-    # Sets include directories and additional dependencies for MSVC.
-    # Renames OpenCV_{vars}to be compatible with non-MSVC env (OPENCV_{vars}).
-    set(OPENCV_INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
-    set(OPENCV_LIBRARY_DIRS "${OpenCV_DIR}/x86/vc12/lib")
-    set(OPENCV_LIBRARIES ${OpenCV_LIBRARIES})
-else(MSVC)
-    # non-MSVC environment.
-    include(FindPkgConfig)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(OPENCV REQUIRED opencv)
-    if (NOT OPENCV_FOUND)
-        message(FATAL_ERROR "OpenCV not found")
-    endif()
-
-    add_definitions(-std=c++11)
-endif(MSVC)
+# OpenCV 3.x/4.x ships CMake config files (OpenCVConfig.cmake), so
+# find_package works on every platform. On Windows, point CMake at the
+# OpenCV build directory with -DOpenCV_DIR=<path> or the OPENCV_DIR
+# environment variable if it is not found automatically.
+find_package(OpenCV REQUIRED)
 
 set(nyan_cat_SOURCE_FILES
     DnaBrush.cpp
@@ -38,7 +25,6 @@ set(nyan_cat_SOURCE_FILES
     tools.cpp
     )
 
-link_directories(${OPENCV_LIBRARY_DIRS})
-include_directories(${OPENCV_INCLUDE_DIRS})
 add_executable(nyan_cat ${nyan_cat_SOURCE_FILES})
-target_link_libraries(nyan_cat ${OpenCV_LIBRARIES})
+target_include_directories(nyan_cat PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(nyan_cat PRIVATE ${OpenCV_LIBS})

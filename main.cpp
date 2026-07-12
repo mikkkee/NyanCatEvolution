@@ -3,5 +3,5 @@
 int main()
 {
 	tools::StartEvolution("a.png");
-	system("pause");
+	return 0;
 }

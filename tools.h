@@ -2,8 +2,7 @@
 #define EVOART_TOOLS_H_
 
 #include <string>
-#include <opencv/cv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core.hpp>
 
 class DnaPoint;
 class DnaPolygon;
@@ -56,10 +55,10 @@ void PrintCanvas(const DnaCanvas& canvas);
 // Prints evolution details into console in human readable format:
 // P: # of mutations | S: # of "good" mutations | Nplgns: # of polygons used
 // | Npts: # of points on canvas | Score: current fittness score
-void PrintEvolution(const int generation, const int selected,
+void PrintEvolution(const long long generation, const long long selected,
 	const double score, const DnaCanvas& canvas);
 
 // Used to log number of mutations / good mucations / fitness score vs time.
-void WriteLog(const int population, const int selected, const double score);
+void WriteLog(const long long population, const long long selected, const double score);
 }
 #endif

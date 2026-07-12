@@ -1,7 +1,7 @@
 #ifndef EVOART_DNABRUSH_H_
 #define EVOART_DNABRUSH_H_
 
-#include "DnaCanvas.h"
+class DnaCanvas;
 
 // This class defines a RGBA color.
 // Example:
@@ -10,7 +10,6 @@ class DnaBrush
 {
 public:
 	DnaBrush();
-	DnaBrush * Clone();
 	void Mutate(DnaCanvas& canvas);
 
 	int blue;
